@@ -11,6 +11,9 @@ export function runWebSocketServer(websocketPort: number) {
 
   server.on("connection", (ws) => {
     console.log("New client connected!");
+    let currentUserId: number | null = null;
+    console.log(`currentUserId: ${currentUserId}`);
+
     ws.on("message", (message) => {
       const { type, data } = JSON.parse(message.toString());
       console.log("Received message from client:", type, data);
@@ -19,6 +22,7 @@ export function runWebSocketServer(websocketPort: number) {
         case "reg":
           {
             const response = handleRegistration(data);
+            currentUserId = JSON.parse(response).index;
             ws.send(JSON.stringify({ type: "reg", data: response, id: 0 }));
             ws.send(
               JSON.stringify({
@@ -31,6 +35,10 @@ export function runWebSocketServer(websocketPort: number) {
           break;
         case "create_room":
           {
+            if (currentUserId !== null) {
+              console.log(`User ${currentUserId} sent a message:`, data);
+              // Add your logic here to process the user's message
+            }
             const response = handleRoomCreation();
             ws.send(
               JSON.stringify({
