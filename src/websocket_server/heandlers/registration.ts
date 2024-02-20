@@ -7,9 +7,9 @@ export function handleRegistration(input: string) {
   if (existingPlayer) {
     return JSON.stringify({
       name: data.name,
-      index: null,
-      error: true,
-      errorText: "Player already exists",
+      index: existingPlayer.index,
+      error: false,
+      errorText: "You are loggedIn",
     });
   }
 
@@ -26,6 +26,6 @@ export function handleRegistration(input: string) {
     name: data.name,
     index: id,
     error: false,
-    errorText: "",
+    errorText: "Account created, and loggedIn",
   });
 }

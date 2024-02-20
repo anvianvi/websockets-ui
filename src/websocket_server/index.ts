@@ -1,49 +1,47 @@
 import { WebSocketServer } from "ws";
-import { players } from "../db";
 import { handleRegistration } from "./heandlers/registration";
+import { handleRoomCreation } from "./heandlers/create-room";
+import { roomsWithOnePlayer } from "./heandlers/update-rooms-state";
+import { setUpDefaultData } from "./default-date";
 
 export function runWebSocketServer(websocketPort: number) {
   const server = new WebSocketServer({ port: websocketPort });
 
-  let defaultUser = {
-    index: 0,
-    name: "admin",
-    password: "admin",
-  };
-
-  players.push(defaultUser);
+  setUpDefaultData();
 
   server.on("connection", (ws) => {
     console.log("New client connected!");
-
     ws.on("message", (message) => {
       const { type, data } = JSON.parse(message.toString());
       console.log("Received message from client:", type, data);
-      console.log(players);
-      console.log(players.length);
 
       switch (type) {
         case "reg":
           {
-            let response = handleRegistration(data);
-            console.log(response);
+            const response = handleRegistration(data);
             ws.send(JSON.stringify({ type: "reg", data: response, id: 0 }));
+            ws.send(
+              JSON.stringify({
+                type: "update_room",
+                data: roomsWithOnePlayer(),
+                id: 0,
+              })
+            );
           }
           break;
         case "create_room":
-          // Handle room creation
+          {
+            const response = handleRoomCreation();
+            ws.send(
+              JSON.stringify({
+                type: "add_user_to_room",
+                data: response,
+                id: 0,
+              })
+            );
+          }
           break;
         case "add_user_to_room":
-          // Handle adding user to room
-          break;
-        case "add_ships":
-          // Handle adding ships
-          break;
-        case "attack":
-          // Handle attack
-          break;
-        case "randomAttack":
-          // Handle random attack
           break;
         default:
           console.log("Unknown command");

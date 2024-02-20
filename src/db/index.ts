@@ -1,5 +1,5 @@
-export let players: Player[] = [];
-let rooms: Room[] = [];
+export const players: Player[] = [];
+export const rooms: Room[] = [];
 // let games: Game[] = [];
 
 export type Player = {
@@ -10,8 +10,8 @@ export type Player = {
 };
 
 export type Room = {
-  roomId: number;
-  players: Player[];
+  indexRoom: number;
+  roomUsers: Player[];
 };
 
 // type Position = {
