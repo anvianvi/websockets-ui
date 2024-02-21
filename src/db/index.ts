@@ -3,15 +3,18 @@ export const rooms: Room[] = [];
 // let games: Game[] = [];
 
 export type Player = {
-  index: number;
+  index: number | null;
   name: string;
   password?: string;
   // ships: Ship[];
 };
 
 export type Room = {
-  indexRoom: number;
-  roomUsers: Player[];
+  roomId: number;
+  roomUsers: {
+    name: string;
+    index: number | null;
+  }[];
 };
 
 // type Position = {

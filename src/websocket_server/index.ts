@@ -3,6 +3,7 @@ import { handleRegistration } from "./heandlers/registration";
 import { handleRoomCreation } from "./heandlers/create-room";
 import { roomsWithOnePlayer } from "./heandlers/update-rooms-state";
 import { setUpDefaultData } from "./default-date";
+import { addUserToRoom } from "./heandlers/add-user-to-room";
 
 export function runWebSocketServer(websocketPort: number) {
   const server = new WebSocketServer({ port: websocketPort });
@@ -11,18 +12,25 @@ export function runWebSocketServer(websocketPort: number) {
 
   server.on("connection", (ws) => {
     console.log("New client connected!");
-    let currentUserId: number | null = null;
-    console.log(`currentUserId: ${currentUserId}`);
+    let currentUser = {
+      index: null,
+      name: "",
+    };
+    console.log(`currentUserId: ${currentUser.index} + ${currentUser.name}`);
 
     ws.on("message", (message) => {
+      console.log(message.toString());
+
       const { type, data } = JSON.parse(message.toString());
-      console.log("Received message from client:", type, data);
+      // console.log("Received message from client:", type, data);
 
       switch (type) {
         case "reg":
           {
             const response = handleRegistration(data);
-            currentUserId = JSON.parse(response).index;
+            currentUser.index = JSON.parse(response).index;
+            currentUser.name = JSON.parse(response).name;
+
             ws.send(JSON.stringify({ type: "reg", data: response, id: 0 }));
             ws.send(
               JSON.stringify({
@@ -35,21 +43,27 @@ export function runWebSocketServer(websocketPort: number) {
           break;
         case "create_room":
           {
-            if (currentUserId !== null) {
-              console.log(`User ${currentUserId} sent a message:`, data);
-              // Add your logic here to process the user's message
-            }
-            const response = handleRoomCreation();
+            console.log(`User ${currentUser.name} sent a message:`, type, data);
+            handleRoomCreation(currentUser);
             ws.send(
               JSON.stringify({
-                type: "add_user_to_room",
-                data: response,
+                type: "update_room",
+                data: roomsWithOnePlayer(),
                 id: 0,
               })
             );
           }
           break;
         case "add_user_to_room":
+          console.log(`User ${currentUser.name} sent a message:`, type, data);
+          addUserToRoom(data, currentUser);
+          ws.send(
+            JSON.stringify({
+              type: "update_room",
+              data: roomsWithOnePlayer(),
+              id: 0,
+            })
+          );
           break;
         default:
           console.log("Unknown command");

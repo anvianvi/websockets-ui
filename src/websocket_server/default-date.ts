@@ -10,11 +10,11 @@ export function setUpDefaultData() {
   players.push(defaultUser);
 
   let defaultRoom = {
-    indexRoom: 0,
+    roomId: 0,
     roomUsers: [
       {
-        index: 0,
         name: "admin",
+        index: 0,
       },
     ],
   };
