@@ -56,11 +56,17 @@ export function runWebSocketServer(websocketPort: number) {
           break;
         case "add_user_to_room":
           console.log(`User ${currentUser.name} sent a message:`, type, data);
-          addUserToRoom(data, currentUser);
           ws.send(
             JSON.stringify({
               type: "update_room",
               data: roomsWithOnePlayer(),
+              id: 0,
+            })
+          );
+          ws.send(
+            JSON.stringify({
+              type: "create_game",
+              data: addUserToRoom(data, currentUser),
               id: 0,
             })
           );
